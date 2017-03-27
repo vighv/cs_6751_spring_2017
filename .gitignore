@@ -2,6 +2,37 @@
 Thumbs.db
 ehthumbs.db
 
+# Latex intermediate files
+*.aux
+*.glo
+*.idx
+*.log
+*.toc
+*.ist
+*.acn
+*.acr
+*.alg
+*.bbl
+*.blg
+*.dvi
+*.glg
+*.gls
+*.ilg
+*.ind
+*.lof
+*.lot
+*.maf
+*.mtc
+*.mtc1
+*.fls
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.out
+
+
+
+
 # Folder config file
 Desktop.ini
 
@@ -45,3 +76,4 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
