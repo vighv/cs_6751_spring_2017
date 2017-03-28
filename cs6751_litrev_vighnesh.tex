@@ -374,9 +374,10 @@
 
 
 
-\IEEEPARstart{T}{his} demo file is intended to serve as a ``starter file'' for IEEE journal papers produced under \LaTeX\ using IEEEtran.cls version 1.8b and later.~\cite{belter2013mechanical}
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
+\IEEEPARstart{G}{rasping} end-effectors are one of the most commonly employed manipulation tools in robotic arms. Most literature on grasping-based manipulation~\cite{prattichizzo2016grasping} considers the scenario in which the robotic arm firmly grips the object, immobilizing it and making it a part of the arm. To place the object in its desired goal configuration is then considered to be a path-planning problem in the $C$--space of the robotic arm~\cite{brock2008motion,kavraki2016motion}, which has been augmented with the grasped object. 
+
+On the contrary, humans tend not to manipulate objects in their environment with merely pick-and-place style grasping. For instance, to move a box across a table, one may slide it over the surface by pushing~\cite{chavan2015prehensile}. This form of motion is termed as \textit{prehensile} manipulation. In this class of motion, the object is not assumed to be completely immobilized by the manipulator. Based on the geometry of the object and the robot's end-effector, we can identify configurations that either completely immobilize an object (grasps), or constrain in within the end-effector in such a way that it cannot escape to infinity, but is not completely immobilized (cages)
+
 
 
 
@@ -384,17 +385,7 @@
 
 
 
-% needed in second column of first page if using \IEEEpubid
-%\IEEEpubidadjcol
 
-
-
-
-
-
-
-% Can use something like this to put references on a page
-% by themselves when using endfloat and the captionsoff option.
 \ifCLASSOPTIONcaptionsoff
   \newpage
 \fi
