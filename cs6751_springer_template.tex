@@ -23,9 +23,6 @@
 \usepackage{graphicx}
 \usepackage[]{epstopdf}
 \usepackage{url}
-\urldef{\mailsa}\path|{alfred.hofmann, ursula.barth, ingrid.haas, frank.holzwarth,|
-\urldef{\mailsb}\path|anna.kramer, leonie.kunz, christine.reiss, nicole.sator,|
-\urldef{\mailsc}\path|erika.siebert-cole, peter.strasser, lncs}@springer.com|    
 \newcommand{\keywords}[1]{\par\addvspace\baselineskip
 \noindent\keywordname\enspace\ignorespaces#1}
 
@@ -34,7 +31,7 @@
 \mainmatter  % start of an individual contribution
 
 % first the title is needed
-\title{\huge{Report for CS 6751, Spring 2017} \\ \Large{Grasping and Prehensile Manipulation Project}}
+\title{\LARGE{Report for CS 6751, Spring 2017} \\ \Large{Grasping and Prehensile Manipulation Project}}
 
 % a short form should be given in case it is too long for the running head
 \titlerunning{Lecture Notes in Computer Science: Authors' Instructions}
@@ -98,10 +95,14 @@ Broadly, we can distinguish between control and planning for manipulation tasks.
 
 This project is aimed at developing a manipulation planner for a robot arm that uses the motion primitives of grasping, caging, and pushing, along with arm translation and rotation. Thus far, most prior work on planning has assumed the grasping primitive to be true, thus reducing the problem to finding a path in $C$--space of the robot. One such set of algorithms distinguishes between \textit{transit} paths, where the object is not in contact with the robot, and \textit{transfer} paths, where the contact is achieved~\cite{alami1994two}. In the interim of switching between these two modes, it is assumed that an immobilizing grasp can be found. Work specific to prehensile motions (caging, pushing) includes efforts to geometrically model a pushing motion to facilitate a grasp~\cite{dogar2010push}, and caging-specific tree-search based algorithms~\cite{diankov2008manipulation}. There have also been efforts to incorporate object physics, friction and mechanics modeling for highly dynamic motion plans that allow for the object to move as an independent object during the plan~\cite{dogar2012physics}. Finally, there are task-space based planners that assume a quasi-static motion of objects, while taking into account the uncertainty in their position, implemented using an RRT-based search~\cite{berenson2009addressing}.
 
-I aim to extend the state of the art by generating a planner that can switch between pushing, caging and grasping based on the object, environment and goal. At present, tree-search and probabilistic roadmap~\cite{kavraki2016motion} based approaches are being explored where the switching condition emerges as a consequence of a suitable search heuristic cost function.
+I aim to extend the state of the art by generating a planner that can switch between pushing, caging and grasping based on the environment and goal for a particular prismatic object. At present, tree-search and probabilistic roadmap~\cite{kavraki2016motion} based approaches are being explored where the switching condition emerges as a consequence of a suitable search heuristic cost function.
 
 
 \section{Technical Contribution}
+
+Kinect gives position, orientation of pipe. Then specify end goal position and orientation. Then run three parallel PRM* trees with motion primitives, apply motion with lowest cost based on heuristic. Switch between motions when one cost becomes lower than others, or other two become intractable, like pushing or caging when lifting up. Testing remains to be done.
+
+
 
 \bibliographystyle{splncs03}
 \bibliography{IEEEabrv,references}
