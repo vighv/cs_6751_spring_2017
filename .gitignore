@@ -30,7 +30,8 @@ ehthumbs.db
 *.fdb_latexmk
 *.out
 
-
+# Suppress PDF for upload speed:
+cs6751_springer_template.pdf
 
 
 # Folder config file
