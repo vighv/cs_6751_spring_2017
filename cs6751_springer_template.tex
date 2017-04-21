@@ -34,7 +34,7 @@
 \title{\LARGE{Report for CS 6751, Spring 2017} \\ \Large{Grasping and Prehensile Manipulation Project}}
 
 % a short form should be given in case it is too long for the running head
-\titlerunning{Lecture Notes in Computer Science: Authors' Instructions}
+\titlerunning{Report for CS 6751, Spring 2017}
 
 % the name(s) of the author(s) follow(s) next
 %
@@ -50,7 +50,7 @@
 %Anna Kramer\and Leonie Kunz\and Christine Rei\ss\and\\
 %Nicole Sator\and Erika Siebert-Cole\and Peter Stra\ss er}
 %
-\authorrunning{Lecture Notes in Computer Science: Authors' Instructions}
+\authorrunning{Vighnesh Vatsal}
 % (feature abused for this document to repeat the title also on left hand pages)
 
 % the affiliations are given next; don't give your e-mail address
@@ -83,10 +83,10 @@ Cornell University}
 %the abstract section}
 %\end{abstract}
 
-\section{Introduction}
+%\section{Introduction}
 
 
-\section{Literature Review}
+\section{Literature Review} \label{sec:lit_review}
 Grasping end-effectors are one of the most commonly employed manipulation tools in robotic arms. Most literature on grasping-based manipulation~\cite{prattichizzo2016grasping} considers the scenario in which the robotic arm firmly grips the object, immobilizing it and making it a part of the arm. To place the object in its desired goal configuration is then considered to be a path-planning problem in the $C$--space of the robotic arm~\cite{brock2008motion}, which has been augmented with the grasped object. 
 
 On the contrary, humans tend not to manipulate objects in their environment with only pick-and-place style grasping. For instance, to move a box across a table, one may slide it over the surface by pushing~\cite{chavan2015prehensile}. This form of motion is termed as \textit{prehensile} manipulation. In this class of motion, the object is not assumed to be an extension of the manipulator. Based on the geometry of the object and the robot's end-effector, we can identify configurations that either completely immobilize an object (grasps), or constrain it in such a way that it cannot escape to infinity, but is not completely immobilized (cages). The full geometric framework for these conditions is presented in~\cite{rodriguez2012caging}.
@@ -99,6 +99,72 @@ I aim to extend the state of the art by generating a planner that can switch bet
 
 
 \section{Technical Contribution}
+
+\subsection{Motion Primitives}
+\begin{figure}
+\centering
+	\includegraphics[height=0.2\columnwidth]{images/grasping.png}
+ 	\includegraphics[height=0.2\columnwidth]{images/caging.png}
+	\includegraphics[height=0.2\columnwidth]{images/pushing.png}
+\caption{The three motion primitives in the manipulation task with a two-finger gripper and a pipe: grasping, caging, and pushing}
+\label{fig:primitives}
+\end{figure}
+
+The manipulation task to be performed in this work is for a two-finger end effector-based robotic arm to take an object from an initial state to a specified goal state. To accomplish this, the robot makes use of three manipulation primitives (Fig.~\ref{fig:primitives}):
+\begin{itemize}
+
+\item \textit{Grasping:} As mentioned in Section~\ref{sec:lit_review}, this is the most commonly employed manipulation primitive in robotic arms. It involves a full force closure on the object, rendering it immobile and effectively converting it into an extension of the end-effector. It allows for the full 6-degrees of freedom (DoF) translation and rotation of the object.  
+
+\item \textit{Caging:} Caging involves constraining the object such that it is unable to move arbitrarily far away from the end-effector. However, it is free to move within the geometric confines of the end effector. Specifically in the case of a two-finger gripper caging a pipe about its diameter, the pipe is free to move in the axial direction, and free to rotate about any axis. The only constraint is that its center of mass must translate along with the gripper on a flat surface.
+
+\item \textit{Pushing:} Pushing differs from caging in the way that the gripper is unable to rotate the object. It can only slide it along a flat surface while preserving orientation.   
+\end{itemize}
+
+\subsection{System Description}
+\begin{figure}
+\centering
+	\includegraphics[width=0.9\columnwidth]{images/baxter.jpg}
+\caption{Baxter robot system setup for the manipulation task}
+\label{fig:system}
+\end{figure}
+
+The setup for demonstrating the proposed prehensile manipulation planner consists of the following components: a Baxter robot (Fig.~\ref{fig:system}), an overhead Kinect camera, a flat table, a raised board, and a marked PVC pipe to be manipulated.
+
+There are underlying simplifying assumptions in the structure of this setup:
+\begin{itemize}
+\item
+The PVC pipe is specifically chosen because of its prismatic shape for ease of grasping, pushing and caging it by the Baxter robot's gripper. We are not investigating the effect of object affordances in the present planning scheme. 
+\item
+All motions are performed in a quasi-static manner. This assumption also implies that there is sufficient friction present between every relevant surface to prevent dynamic motions such as rolling of the pipe while pushing. 
+\item
+There are no obstacles present in this environment.
+\item
+The positions the center of mass of every object apart from the pipe are static.
+\item
+The pipe always remains coplanar with the flat table surfaces. 
+\end{itemize}
+
+\subsection{Planning Framework}
+
+\begin{figure}
+\centering
+	\includegraphics[width=0.8\columnwidth]{images/flow.png}
+\caption{Planning framework followed for the manipulation task}
+\label{fig:plan}
+\end{figure}
+
+
+The pipe is a rigid body, whose state $s \in SE(3)$. It can lie on a series of flat planes such with fixed $Z$ coordinate and prescribed limits on the $X$ and $Y$ coordinates. The problem statement is then to take the pipe from $s_i \in SE(3)$ to $s_f \in SE(3)$ using a sequence of movements of the robotic arm in its $C$-space. The structure of the problem imposes that only the $(x,y,z)$ and $\theta$ (rotation about the $Z$ axis) coordinates of the pipe are variable. These are computed using RBG-sensing of the end-points of the pipe with a known radius. Since planning is performed in the $C$-space, it is beneficial to formulate the problem in terms of the robot's end-effector. We can use the same four coordinates for this purpose: $(x,y,z,\theta)$, but this time of the end-effector. Each primitive imposes constraints on the motion of the robot end-effector:
+
+\begin{itemize}
+\item Pushing requires that $\theta$ and $z$ remain constant, while $x$ and $y$ are variable, normal to $\theta$ of the pipe.
+\item Caging requires $z$ to be constant, all other coordinates are variable
+\item Grasping imposes no extra constraints
+\end{itemize} 
+
+The Open Motion Planning Library (OMPL) allows us to specify initial and final positions for the end-effector in Cartesian space and generates motion plans in the $C$-space for Baxter's arm.  
+
+Once the initial state of the pipe is known, intermediate states $s_t \in SE(3)$ is found that is as close as possible to $s_f$ within the constraints for each primitive, e.g. if the plan involves pure translation in all three directions, the intermediate state for caging or pushing would be $(x_f,y_f,z_i,\theta_i)$, while that for grasping would be $(x_f,y_f,z_f,\theta_i)$ 
 
 Kinect gives position, orientation of pipe. Then specify end goal position and orientation. Then run three parallel PRM* trees with motion primitives, apply motion with lowest cost based on heuristic. Switch between motions when one cost becomes lower than others, or other two become intractable, like pushing or caging when lifting up. Testing remains to be done.
 
