@@ -162,13 +162,19 @@ The pipe is a rigid body, whose state $s \in SE(3)$. It can lie on a series of f
 \item Grasping imposes no extra constraints
 \end{itemize} 
 
-The Open Motion Planning Library (OMPL) allows us to specify initial and final positions for the end-effector in Cartesian space and generates motion plans in the $C$-space for Baxter's arm.  
+The Open Motion Planning Library (OMPL) allows us to specify initial and final positions for the end-effector in Cartesian space and generates motion plans in the $C$-space for Baxter's arm using the PRM* algorithm. 
 
 Once the initial state of the pipe is known, intermediate states $s_t \in SE(3)$ is found that is as close as possible to $s_f$ within the constraints for each primitive, e.g. if the plan involves pure translation in all three directions, the intermediate state for caging or pushing would be $(x_f,y_f,z_i,\theta_i)$, while that for grasping would be $(x_f,y_f,z_f,\theta_i)$ 
 
-Kinect gives position, orientation of pipe. Then specify end goal position and orientation. Then run three parallel PRM* trees with motion primitives, apply motion with lowest cost based on heuristic. Switch between motions when one cost becomes lower than others, or other two become intractable, like pushing or caging when lifting up. Testing remains to be done.
+Then for each of these intermediate states, a heuristic cost function $h(p)$ is computed for a path $p$ going from $s_i$ to $s_t$ in the PRM* algorithm:
 
+\begin{equation}
+h = f_{energy} + f_{config} + f_{primitive}
+\end{equation}\label{eq:heuristic}
 
+Where $f_{energy}$ denotes the energy expended by the robot in performing a plan, $f_{config}$ is the penalty for being far away from the final configuration, and $f_{primitive}$ is the ``ease" of each primitive, following the order pushing $<$ caging $<$ grasping.
+
+The primitive that has the lowest heuristic cost is executed till $s_t$. At this stage, new intermediates are attempted to be found for each primitive. If another primitive has a lower cost, or the others are infeasible, e.g. only grasping can lift the pipe above the table, the planner switches over to another primitive motion, until the goal state $s_f$ is reached.
 
 \bibliographystyle{splncs03}
 \bibliography{IEEEabrv,references}
