@@ -85,9 +85,17 @@ Cornell University}
 
 %\section{Introduction}
 
+\section{Introduction} \label{sec:intro}
+Grasping end-effectors are one of the most commonly employed manipulation tools in robotic arms. This has followed historically from designs of anthropomorphic end-effectors that mimic the grasping motion performed by the human thumb and forefingers. While grasping is indeed an important function of our hands, it is far from the only mode of interaction between our hands and the environment.
+
+Grasping an object in one's hand effectively turns it into an extension of the arm, being completely constrained and moving with the human arm. However, there are numerous scenarios where such a constraint is neither desired nor necessary. For example, if the task at hand is to move a large block of wood over a flat surface, it would be impractical to try and grasp it. Instead, most people would try to push it along the surface. Another mode of interaction is \textit{caging}, where the body is free to move within the gripper but cannot escape it. An example of this mode would be sliding a mug along a table while it is loosely held within the hand. As humans, we also use a host of other factors to arrive at a manipulation mode, such as gravity, friction, the shape, size and weight of the object, and implicitly, the shape, size and effort capabilities of our own hands.  
+
+However, when imbuing robots with manipulation capabilities, the focus has not been on these less-constrained modes. The reasons for this range from safety to computational planning load. Expending extra effort to tackle uncertainties in the pose of an object being manipulated by a robot using a less-constrained mode was not desirable. The planning problem for a robotic arm remains virtually unchanged if the object is simply added as a rigid body at the end of the kinematic chain. Therefore, most state of the art robots and manipulation planners treat the problem as being divided into two parts: finding a grasping pose, and then performing a motion with the object firmly grasped. This approach is fairly efficient and useful in multiple real-world applications. However, by ignoring the possibility of other modes of manipulation, robots are unable to perform a range of tasks that humans are capable of. As another consequence of this single-minded focus on grasping, we encounter robot motions that seem highly non-intuitive and inefficient to a human observer.       
+
+I aim to extend the state of the art by generating a planner that can switch between pushing, caging and grasping based on the environment and goal for a particular prismatic object. At present, an approach based on tree-search is being explored where the switching condition emerges as a consequence of a suitable search heuristic cost function. This approach is being implemented on a Baxter commercial robot with two-fingered grippers as the end-effectors of two 7-DoF arms.
 
 \section{Literature Review} \label{sec:lit_review}
-Grasping end-effectors are one of the most commonly employed manipulation tools in robotic arms. Most literature on grasping-based manipulation~\cite{prattichizzo2016grasping} considers the scenario in which the robotic arm firmly grips the object, immobilizing it and making it a part of the arm. To place the object in its desired goal configuration is then considered to be a path-planning problem in the $C$--space of the robotic arm~\cite{brock2008motion}, which has been augmented with the grasped object. 
+Most literature on grasping-based manipulation~\cite{prattichizzo2016grasping} considers the scenario in which the robotic arm firmly grips the object, immobilizing it and making it a part of the arm. To place the object in its desired goal configuration is then considered to be a path-planning problem in the $C$--space of the robotic arm~\cite{brock2008motion}, which has been augmented with the grasped object. 
 
 On the contrary, humans tend not to manipulate objects in their environment with only pick-and-place style grasping. For instance, to move a box across a table, one may slide it over the surface by pushing~\cite{chavan2015prehensile}. This form of motion is termed as \textit{prehensile} manipulation. In this class of motion, the object is not assumed to be an extension of the manipulator. Based on the geometry of the object and the robot's end-effector, we can identify configurations that either completely immobilize an object (grasps), or constrain it in such a way that it cannot escape to infinity, but is not completely immobilized (cages). The full geometric framework for these conditions is presented in~\cite{rodriguez2012caging}.
 
@@ -95,7 +103,7 @@ Broadly, we can distinguish between control and planning for manipulation tasks.
 
 This project is aimed at developing a manipulation planner for a robot arm that uses the motion primitives of grasping, caging, and pushing, along with arm translation and rotation. Thus far, most prior work on planning has assumed the grasping primitive to be true, thus reducing the problem to finding a path in $C$--space of the robot. One such set of algorithms distinguishes between \textit{transit} paths, where the object is not in contact with the robot, and \textit{transfer} paths, where the contact is achieved~\cite{alami1994two}. In the interim of switching between these two modes, it is assumed that an immobilizing grasp can be found. Work specific to prehensile motions (caging, pushing) includes efforts to geometrically model a pushing motion to facilitate a grasp~\cite{dogar2010push}, and caging-specific tree-search based algorithms~\cite{diankov2008manipulation}. There have also been efforts to incorporate object physics, friction and mechanics modeling for highly dynamic motion plans that allow for the object to move as an independent object during the plan~\cite{dogar2012physics}. Finally, there are task-space based planners that assume a quasi-static motion of objects, while taking into account the uncertainty in their position, implemented using an RRT-based search~\cite{berenson2009addressing}.
 
-I aim to extend the state of the art by generating a planner that can switch between pushing, caging and grasping based on the environment and goal for a particular prismatic object. At present, tree-search and probabilistic roadmap~\cite{kavraki2016motion} based approaches are being explored where the switching condition emerges as a consequence of a suitable search heuristic cost function.
+
 
 
 \section{Technical Contribution}
@@ -154,7 +162,7 @@ The pipe always remains coplanar with the flat table surfaces.
 \end{figure}
 
 
-The pipe is a rigid body, whose state $s \in SE(3)$. It can lie on a series of flat planes such with fixed $Z$ coordinate and prescribed limits on the $X$ and $Y$ coordinates. The problem statement is then to take the pipe from $s_i \in SE(3)$ to $s_f \in SE(3)$ using a sequence of movements of the robotic arm in its $C$-space. The structure of the problem imposes that only the $(x,y,z)$ and $\theta$ (rotation about the $Z$ axis) coordinates of the pipe are variable. These are computed using RBG-sensing of the end-points of the pipe with a known radius. Since planning is performed in the $C$-space, it is beneficial to formulate the problem in terms of the robot's end-effector. We can use the same four coordinates for this purpose: $(x,y,z,\theta)$, but this time of the end-effector. Each primitive imposes constraints on the motion of the robot end-effector:
+The pipe is a rigid body, whose state is $s \in SE(3)$. It can lie on a series of flat planes with fixed $Z$ coordinates and prescribed limits on the $X$ and $Y$ coordinates. The problem statement is then to take the pipe from $s_i \in SE(3)$ to $s_f \in SE(3)$ using a sequence of movements of the robotic arm in its $C$-space. The structure of the problem imposes that only the $(x,y,z)$ and $\theta$ (rotation about the $Z$ axis) coordinates of the pipe are variable. These are computed using RGB-sensing of the end-points of the pipe with a known radius. Since planning is performed in the $C$-space, it is beneficial to formulate the problem in terms of the robot's end-effector. We can use the same four coordinates for this purpose: $(x,y,z,\theta)$, but this time of the end-effector. Each primitive imposes constraints on the motion of the robot end-effector:
 
 \begin{itemize}
 \item Pushing requires that $\theta$ and $z$ remain constant, while $x$ and $y$ are variable, normal to $\theta$ of the pipe.
@@ -162,11 +170,11 @@ The pipe is a rigid body, whose state $s \in SE(3)$. It can lie on a series of f
 \item Grasping imposes no extra constraints
 \end{itemize} 
 
-The Open Motion Planning Library (OMPL) allows us to specify initial and final positions for the end-effector in Cartesian space and generates motion plans in the $C$-space for Baxter's arm using the PRM* algorithm. 
+The Open Motion Planning Library (OMPL) allows us to specify initial and final positions for the end-effector in Cartesian space and generates motion plans in the $C$-space for Baxter's arm using the RRT* algorithm. 
 
 Once the initial state of the pipe is known, intermediate states $s_t \in SE(3)$ is found that is as close as possible to $s_f$ within the constraints for each primitive, e.g. if the plan involves pure translation in all three directions, the intermediate state for caging or pushing would be $(x_f,y_f,z_i,\theta_i)$, while that for grasping would be $(x_f,y_f,z_f,\theta_i)$ 
 
-Then for each of these intermediate states, a heuristic cost function $h(p)$ is computed for a path $p$ going from $s_i$ to $s_t$ in the PRM* algorithm:
+Then for each of these intermediate states, a heuristic cost function $h(p)$ is computed for a path $p$ going from $s_i$ to $s_t$ in the RRT* algorithm:
 
 \begin{equation}
 h = f_{energy} + f_{config} + f_{primitive}
