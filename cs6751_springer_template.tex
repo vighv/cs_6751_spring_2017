@@ -192,9 +192,9 @@ The primitive that has the lowest heuristic cost is executed till $s_t$. At this
 
 \begin{figure}[ht]
 \centering
-	\includegraphics[height=0.3\columnwidth]{images/vec_avg_x.png}
-	\includegraphics[height=0.3\columnwidth]{images/vec_avg_y.png}
-	\includegraphics[height=0.3\columnwidth]{images/vec_avg_z.png}
+	\includegraphics[height=0.35\columnwidth]{images/vec_avg_x.png}
+	\includegraphics[height=0.35\columnwidth]{images/vec_avg_y.png}
+	\includegraphics[height=0.35\columnwidth]{images/vec_avg_z.png}
 \caption{Components of the position vector between the Kinect and Baxter frames of reference}
 \label{fig:kinect_to_baxter}
 \end{figure}
@@ -248,7 +248,7 @@ The RRT* planner accomplished this in stages: the first being to position the ar
 \label{fig:cage}
 \end{figure} 
 
-Once a cage is established, the robot drags the pipe along the table until the mode switches to grasping. This occurs when it gets close to the edge of the board and cannot raise the pipe by caging. If the pipe had been rotated while performing the dragging motion after caging, a re-orientation of the end-effector is carried out so that the gripper's fingers are parallel to the pipe again, with the gripper's center above the pipe's mid-point. Then a grasp is completed by bringing down the gripper onto the pipe. One the grasp is successful, the pipe is lifted off the table and placed onto the board at the desired position and orientation (Fig.~\ref).
+Once a cage is established, the robot drags the pipe along the table until the mode switches to grasping. This occurs when it gets close to the edge of the board and cannot raise the pipe by caging. If the pipe had been rotated while performing the dragging motion after caging, a re-orientation of the end-effector is carried out so that the gripper's fingers are parallel to the pipe again, with the gripper's center above the pipe's mid-point. Then a grasp is completed by bringing down the gripper onto the pipe. One the grasp is successful, the pipe is lifted off the table and placed onto the board at the desired position and orientation (Fig.~\ref{fig:grasp}).
 
 \begin{figure}[ht]
 \centering
@@ -258,8 +258,9 @@ Once a cage is established, the robot drags the pipe along the table until the m
 \label{fig:grasp}
 \end{figure}
 
-\section{Conclusions and Future Work}
-
+\section{Conclusions}
+This project served as a proof of concept for a manipulation planner that was able to switch between modes of manipulation based on a cost function that depended on the object and task. Presently, the limitations include long durations between planning stages ($\sim$ 20 seconds), imprecise positioning due to Kinect tracking errors, and minimal tolerance to such errors due to the open-loop nature of control. Also, the completeness of this approach has not been theoretically guaranteed.
+Going forward, a closed-loop controller based on visual servoing could be explored, along with offline generation of trajectories to speed up the physical implementation. 
 \bibliographystyle{splncs03}
 \bibliography{IEEEabrv,references}
 
