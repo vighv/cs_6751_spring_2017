@@ -106,7 +106,7 @@ This project is aimed at developing a manipulation planner for a robot arm that 
 
 
 
-\section{Technical Contribution}
+\section{Technical Description}
 
 \subsection{Motion Primitives}
 \begin{figure}
@@ -183,6 +183,17 @@ h = f_{energy} + f_{config} + f_{primitive}
 Where $f_{energy}$ denotes the energy expended by the robot in performing a plan, $f_{config}$ is the penalty for being far away from the final configuration, and $f_{primitive}$ is the ``ease" of each primitive, following the order pushing $<$ caging $<$ grasping.
 
 The primitive that has the lowest heuristic cost is executed till $s_t$. At this stage, new intermediates are attempted to be found for each primitive. If another primitive has a lower cost, or the others are infeasible, e.g. only grasping can lift the pipe above the table, the planner switches over to another primitive motion, until the goal state $s_f$ is reached.
+
+
+\section{Implementation}
+
+\subsection{Kinect Sensing and Transformations}
+
+\subsection{State Machines: ROS-SMACH}
+
+\subsection{MoveIt! Planning}
+
+\subsection{Results}
 
 \bibliographystyle{splncs03}
 \bibliography{IEEEabrv,references}
