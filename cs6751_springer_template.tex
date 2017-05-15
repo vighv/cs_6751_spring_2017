@@ -154,7 +154,7 @@ The pipe always remains coplanar with the flat table surfaces.
 \end{itemize}
 
 \subsection{Planning Framework}
-
+\label{sec:planning}
 \begin{figure}
 \centering
 	\includegraphics[width=0.8\columnwidth]{images/flow.png}
@@ -211,21 +211,54 @@ A calibration routine is performed to find the position vector between the Baxte
 
 \begin{figure}[ht]
 \centering
-	\includegraphics[height=0.3\columnwidth]{images/vec_avg_x.png}
-	\includegraphics[height=0.3\columnwidth]{images/vec_avg_y.png}	
+	\includegraphics[height=0.3\columnwidth]{images/pipe1.png}
+	\includegraphics[height=0.3\columnwidth]{images/pipe2.png}	
 \caption{Images of the end points of the pipe captured by RGB sensing on the Kinect}
 \label{fig:kinect_rgb}
 \end{figure}
 
 Once the positions of the end points of the pipe are obtained (Fig.~\ref{fig:kinect_rgb}), its orientation on the table can be determined. This allows us to set a position and orientation of the end-effector appropriately for pushing, caging or grasping. For caging and grasping, the gripper is over the mid-point with the orientation parallel to the pipe's, while for pushing it is at a distance equal to the radius of the pipe away from the mid-point along the normal to the pipe, and oriented along the normal.
 
-\subsection{State Machines: ROS-SMACH}
-The planning framework shown in Fig.~\ref{fig:plan} is implemented with state machines using the ROS-SMACH framework. We define the three motion primitive states: pushing, caging and grasping
-
+%\subsection{State Machines: ROS-SMACH}
+%The planning framework shown in Fig.~\ref{fig:plan} is implemented with state machines using the ROS-SMACH framework. We define the three motion primitive states: pushing, caging and grasping
 
 \subsection{MoveIt! Planning}
+The motion planning using an RRT* algorithm mentioned in Section~\ref{sec:planning} is implemented using the MoveIt! framework for ROS~\cite{sucan2013moveit}. MoveIt is convenient because it has built-in support for Kinect sensing, and it presents a simplified framework for writing a motion planner. Additionally, the Baxter robot has existing packages containing SRDF robot description models.
+
+\begin{figure}[ht]
+\centering
+	\includegraphics[height=0.3\columnwidth]{images/baxter_mv3.png}
+	\includegraphics[height=0.3\columnwidth]{images/baxter_mv4.png}	
+\caption{Visualization of Baxter's MoveIt model and environment in ROS Rviz}
+\label{fig:moveit}
+\end{figure}
+
+MoveIt allows us to add geometric objects in the planning framework, e.g. the desk in our environment represented as a cuboid in front of the robot. This is translated into constraints for the RRT* algorithm. It also allows us to visualize the planned path (Fig.~\ref{fig:moveit}).
 
 \subsection{Results}
+In the final implementation, the task was to move the pipe along the desk, ideally achieved using caging, and then to lift it and place it at an elevated position on a wooden board kept on top of the table.
+
+The RRT* planner accomplished this in stages: the first being to position the arm on top of the pipe in a pre-caging position, with the center of the end-effector directly above the mid-point of the pipe, and the gripper handles parallel to the pipe. After that, the gripper is brought down to complete the cage (Fig,~\ref{fig:cage}).
+
+\begin{figure}[ht]
+\centering
+	\includegraphics[height=0.4\columnwidth]{images/mid_pt.png}
+	\includegraphics[height=0.4\columnwidth]{images/cage.png}	
+\caption{The two stages of caging: positioning, and completing the cage}
+\label{fig:cage}
+\end{figure} 
+
+Once a cage is established, the robot drags the pipe along the table until the mode switches to grasping. This occurs when it gets close to the edge of the board and cannot raise the pipe by caging. If the pipe had been rotated while performing the dragging motion after caging, a re-orientation of the end-effector is carried out so that the gripper's fingers are parallel to the pipe again, with the gripper's center above the pipe's mid-point. Then a grasp is completed by bringing down the gripper onto the pipe. One the grasp is successful, the pipe is lifted off the table and placed onto the board at the desired position and orientation (Fig.~\ref).
+
+\begin{figure}[ht]
+\centering
+	\includegraphics[height=0.3\columnwidth]{images/grasp.png}
+	\includegraphics[height=0.3\columnwidth]{images/grasp_lift.png}	
+\caption{Completing a grasp, and moving the pipe to the goal position on the board}
+\label{fig:grasp}
+\end{figure}
+
+\section{Conclusions and Future Work}
 
 \bibliographystyle{splncs03}
 \bibliography{IEEEabrv,references}
