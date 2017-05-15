@@ -22,6 +22,7 @@
 \setcounter{tocdepth}{3}
 \usepackage{graphicx}
 \usepackage[]{epstopdf}
+\usepackage{amsmath}
 \usepackage{url}
 \newcommand{\keywords}[1]{\par\addvspace\baselineskip
 \noindent\keywordname\enspace\ignorespaces#1}
@@ -189,7 +190,38 @@ The primitive that has the lowest heuristic cost is executed till $s_t$. At this
 
 \subsection{Kinect Sensing and Transformations}
 
+\begin{figure}[ht]
+\centering
+	\includegraphics[height=0.3\columnwidth]{images/vec_avg_x.png}
+	\includegraphics[height=0.3\columnwidth]{images/vec_avg_y.png}
+	\includegraphics[height=0.3\columnwidth]{images/vec_avg_z.png}
+\caption{Components of the position vector between the Kinect and Baxter frames of reference}
+\label{fig:kinect_to_baxter}
+\end{figure}
+
+The overhead Kinect camera is used to track two colored blocks attached to the end-points of the pipe. All data from the Kinect frame is transformed to the Baxter frame using a homogeneous transformation:
+
+\begin{equation}
+\left[ \begin{array}{c} x_{P/B} \\ y_{P/B} \\ z_{P/B} \\ 1 \end{array} \right] = \begin{bmatrix} 0 & 1 & 0 & -x_{B/K} \\ 1 & 0 & 0 & -y_{B/K} \\ 0 & 0 & -1 & -z_{B/K} \\ 0 & 0 & 0 & 1 \\ \end{bmatrix} \left[ \begin{array}{c} x_{P/K} \\ y_{P/K} \\ z_{P/K} \\ 1 \end{array} \right]
+\end{equation}
+
+Here $x_{P/B}$ is the position of a point $P$ in the Baxter frame, $x_{P/K}$ is the position sensed in the Kinect frame, and $x_{B/K}$ is the position vector of the Baxter's origin in the Kinect frame.
+
+A calibration routine is performed to find the position vector between the Baxter's origin and the Kinect frame's origin using end-effector position detection built into the robot. The robot's arm is moved through various positions in 3-D such that the end-effector can be tracked by the Kinect sensor. After reducing the signal noise with a moving average filter, the mean value of the position vector is obtained (Fig.~\ref{fig:kinect_to_baxter}).
+
+\begin{figure}[ht]
+\centering
+	\includegraphics[height=0.3\columnwidth]{images/vec_avg_x.png}
+	\includegraphics[height=0.3\columnwidth]{images/vec_avg_y.png}	
+\caption{Images of the end points of the pipe captured by RGB sensing on the Kinect}
+\label{fig:kinect_rgb}
+\end{figure}
+
+Once the positions of the end points of the pipe are obtained (Fig.~\ref{fig:kinect_rgb}), its orientation on the table can be determined. This allows us to set a position and orientation of the end-effector appropriately for pushing, caging or grasping. For caging and grasping, the gripper is over the mid-point with the orientation parallel to the pipe's, while for pushing it is at a distance equal to the radius of the pipe away from the mid-point along the normal to the pipe, and oriented along the normal.
+
 \subsection{State Machines: ROS-SMACH}
+The planning framework shown in Fig.~\ref{fig:plan} is implemented with state machines using the ROS-SMACH framework. We define the three motion primitive states: pushing, caging and grasping
+
 
 \subsection{MoveIt! Planning}
 
